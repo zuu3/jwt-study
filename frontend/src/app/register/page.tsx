@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import api from '../../utils/api';
 
-export default function LoginPage() {
+export default function RegisterPage() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const router = useRouter();
@@ -11,19 +11,20 @@ export default function LoginPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const res = await api.post(
-        '/token',
-        new URLSearchParams({ username, password })
+      await api.post(
+        '/register',
+        JSON.stringify({ username, password }),
+        { headers: { 'Content-Type': 'application/json' } }
       );
-      localStorage.setItem('access_token', res.data.access_token);
-      router.push('/');
+      router.push('/login');
     } catch {
-      alert('로그인 실패');
+      alert('회원가입 실패');
     }
   };
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', width: 300, gap: 8 }}>
+      <h2>회원가입</h2>
       <input
         value={username}
         onChange={e => setUsername(e.target.value)}
@@ -35,11 +36,12 @@ export default function LoginPage() {
         value={password}
         onChange={e => setPassword(e.target.value)}
         placeholder="password"
+        autoComplete="new-password"
         required
       />
-      <button type="submit">로그인</button>
-      <button type="button" onClick={() => router.push('/register')} style={{ background: 'none', border: 'none', color: 'blue', cursor: 'pointer', marginTop: 4 }}>
-        계정이 없다면 회원가입
+      <button type="submit">회원가입</button>
+      <button type="button" onClick={() => router.push('/login')} style={{ background: 'none', border: 'none', color: 'blue', cursor: 'pointer', marginTop: 4 }}>
+        이미 계정이 있다면 로그인
       </button>
     </form>
   );
